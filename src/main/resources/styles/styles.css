@@ -1,0 +1,233 @@
+/* Root and Global Styles */
+.root {
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-base: #f0f0f0;
+    -fx-background: #f5f5f5;
+}
+
+/* Welcome Screen */
+.welcome-screen {
+    -fx-background-color: linear-gradient(to bottom right, #4a90e2, #8e44ad);
+    -fx-padding: 40px;
+}
+
+.welcome-title {
+    -fx-font-size: 24px;
+    -fx-fill: white;
+    -fx-font-weight: 300;
+}
+
+.app-title {
+    -fx-font-size: 48px;
+    -fx-font-weight: bold;
+    -fx-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0.5, 0, 2);
+}
+
+.welcome-subtitle {
+    -fx-font-size: 18px;
+    -fx-fill: rgba(255, 255, 255, 0.9);
+    -fx-font-style: italic;
+}
+
+.get-started-button {
+    -fx-background-color: #2ecc71;
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-padding: 12px 30px;
+    -fx-background-radius: 30px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 2);
+    -fx-cursor: hand;
+}
+
+.get-started-button:hover {
+    -fx-background-color: #27ae60;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 15, 0, 0, 5);
+}
+
+.features {
+    -fx-padding: 20px 0;
+}
+
+.feature-icon {
+    -fx-fill: #2ecc71;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.feature-text {
+    -fx-fill: white;
+    -fx-font-size: 14px;
+}
+
+/* Recipe List View */
+.recipe-list-container {
+    -fx-padding: 20px;
+    -fx-spacing: 15px;
+}
+
+.header {
+    -fx-padding: 10px 0;
+    -fx-alignment: center-left;
+}
+
+.title-label {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+.search-filter-bar {
+    -fx-padding: 10px 0;
+}
+
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: #ddd;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+}
+
+.table-view .column-header {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #495057;
+    -fx-font-weight: bold;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #e3f2fd;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #f8f9fa;
+}
+
+.button-bar {
+    -fx-padding: 10px 0;
+}
+
+.button {
+    -fx-background-color: #4a90e2;
+    -fx-text-fill: white;
+    -fx-padding: 8px 16px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-cursor: hand;
+    -fx-font-weight: 500;
+}
+
+.button:hover {
+    -fx-opacity: 0.9;
+    -fx-background-color: #3a7bc8;
+}
+
+.delete-button {
+    -fx-background-color: #e74c3c;
+}
+
+.delete-button:hover {
+    -fx-background-color: #c0392b;
+}
+
+.add-button {
+    -fx-background-color: #2ecc71;
+}
+
+.add-button:hover {
+    -fx-background-color: #27ae60;
+}
+
+/* Form Styles */
+.form-container {
+    -fx-padding: 20px;
+    -fx-spacing: 15px;
+    -fx-background-color: white;
+    -fx-border-color: #ddd;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+}
+
+.form-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+.form-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #495057;
+}
+
+.form-field {
+    -fx-pref-height: 35px;
+    -fx-background-radius: 4px;
+    -fx-border-color: #ced4da;
+    -fx-border-radius: 4px;
+    -fx-padding: 5px 10px;
+}
+
+.form-field:focused {
+    -fx-border-color: #80bdff;
+    -fx-effect: dropshadow(gaussian, rgba(0,123,255,0.25), 10, 0, 0, 3);
+}
+
+.text-area {
+    -fx-pref-row-count: 4;
+    -fx-background-radius: 4px;
+    -fx-border-color: #ced4da;
+    -fx-border-radius: 4px;
+    -fx-padding: 5px 10px;
+}
+
+/* Alert Dialogs */
+.dialog-pane {
+    -fx-background-color: white;
+}
+
+.dialog-pane .header-panel {
+    -fx-background-color: #f8f9fa;
+}
+
+.dialog-pane .content {
+    -fx-padding: 20px;
+}
+
+/* Error message styling */
+.error-message {
+    -fx-text-fill: #e74c3c;
+    -fx-font-size: 0.9em;
+    -fx-padding: 5px 0;
+}
+
+/* Success message styling */
+.success-message {
+    -fx-text-fill: #28a745;
+    -fx-font-size: 0.9em;
+    -fx-padding: 5px 0;
+    -fx-font-weight: bold;
+}
+
+/* Utility Classes */
+.spacer {
+    -fx-hgrow: ALWAYS;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 600px) {
+    .welcome-screen {
+        -fx-padding: 20px 10px;
+    }
+    
+    .app-title {
+        -fx-font-size: 36px;
+    }
+    
+    .welcome-title, .welcome-subtitle {
+        -fx-font-size: 18px;
+    }
+}

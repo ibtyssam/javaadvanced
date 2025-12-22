@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import java.net.URL?>
+
+<StackPane xmlns="http://javafx.com/javafx/17.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.myapp.controllers.HomeController" 
+           styleClass="welcome-screen">
+    
+    <VBox alignment="CENTER" spacing="30">
+        <VBox alignment="CENTER" spacing="10">
+            <Text styleClass="welcome-title" text="Welcome to"/>
+            <Text styleClass="app-title" text="Recipe Manager"/>
+            <Text styleClass="welcome-subtitle" text="Your personal recipe organizer"/>
+        </VBox>
+        
+        <Button text="Get Started" onAction="#handleGetStarted" styleClass="get-started-button"/>
+        
+        <VBox alignment="CENTER" spacing="5" styleClass="features">
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Text styleClass="feature-icon" text="✓"/>
+                <Text styleClass="feature-text" text="Add and manage your favorite recipes"/>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Text styleClass="feature-icon" text="✓"/>
+                <Text styleClass="feature-text" text="Search and filter recipes easily"/>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Text styleClass="feature-icon" text="✓"/>
+                <Text styleClass="feature-text" text="Organize by categories"/>
+            </HBox>
+        </VBox>
+    </VBox>
+    
+    <stylesheets>
+        @../styles/styles.css
+    </stylesheets>
+</StackPane>
