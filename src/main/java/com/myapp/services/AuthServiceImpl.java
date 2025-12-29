@@ -1,12 +1,19 @@
 package com.myapp.services;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import com.myapp.dao.UserDao;
 import com.myapp.dao.UserDaoImpl;
 import com.myapp.models.User;
-import org.mindrot.jbcrypt.BCrypt;
 
 public class AuthServiceImpl implements AuthService {
     private final UserDao userDao = new UserDaoImpl();
+
+    // Detect whether the stored password is a BCrypt hash
+    private static boolean isBCryptHash(String s) {
+        if (s == null) return false;
+        return (s.startsWith("$2a$") || s.startsWith("$2b$") || s.startsWith("$2y$")) && s.length() >= 56;
+    }
 
     @Override
     public User login(String email, String password) {
@@ -55,18 +62,4 @@ public class AuthServiceImpl implements AuthService {
         // Rely on DB unique constraint; DAO will throw IllegalArgumentException for duplicates
         return userDao.create(user);
     }
-}
-
-// Package-private helper to detect BCrypt format
-class BCryptUtil {
-    static boolean isBCryptHash(String s) {
-        if (s == null) return false;
-        // Typical BCrypt prefixes and length ~60
-        return (s.startsWith("$2a$") || s.startsWith("$2b$") || s.startsWith("$2y$")) && s.length() >= 56;
-    }
-}
-
-// Allow calling without qualifier inside AuthServiceImpl
-private static boolean isBCryptHash(String s) {
-    return BCryptUtil.isBCryptHash(s);
 }
