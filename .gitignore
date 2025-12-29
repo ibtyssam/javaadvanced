@@ -65,3 +65,22 @@ build/
 
 ### Mac OS ###
 .DS_Store
+# Build outputs
+/target/
+/build/
+/out/
+
+# IDE/editor
+/.idea/
+/.vscode/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Java
+*.class
+
+# Logs
+*.log

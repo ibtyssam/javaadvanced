@@ -1,5 +1,13 @@
 USE recipes_db;
 
+-- Create users table
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL
+);
+
 -- Create recipe table
 CREATE TABLE IF NOT EXISTS recipe (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -9,7 +17,11 @@ CREATE TABLE IF NOT EXISTS recipe (
     cooking_time INT,
     servings INT,
     difficulty VARCHAR(50),
-    category VARCHAR(100)
+    category VARCHAR(100),
+    owner_user_id INT NULL,
+    visibility VARCHAR(10) NOT NULL DEFAULT 'PRIVATE',
+    CONSTRAINT fk_recipe_owner FOREIGN KEY (owner_user_id) REFERENCES users(id) ON DELETE SET NULL,
+    CONSTRAINT chk_visibility CHECK (visibility IN ('PUBLIC','PRIVATE'))
 );
 
 -- Create ingredient table

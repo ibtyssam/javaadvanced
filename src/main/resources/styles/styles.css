@@ -1,3 +1,7 @@
+.auth-root {
+    -fx-background-color: linear-gradient(to bottom right, #4a90e2, #8e44ad);
+    -fx-padding: 40px;
+}
 /* Root and Global Styles */
 .root {
     -fx-font-family: 'Segoe UI', Arial, sans-serif;
@@ -140,6 +144,84 @@
 
 .add-button:hover {
     -fx-background-color: #27ae60;
+}
+
+/* Login Styles */
+.login-container {
+    -fx-padding: 32px;
+    -fx-spacing: 24px;
+    -fx-background-color: #2563eb; /* solid blue container */
+    -fx-background-radius: 16px;
+    -fx-alignment: center;
+    -fx-max-width: 640px;
+}
+
+.login-container .grid-pane {
+    -fx-background-color: #ffffff;
+    -fx-padding: 20px;
+    -fx-border-color: #e0e6ed;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 24, 0, 0, 10);
+}
+
+.login-container .form-label {
+    -fx-font-weight: 600;
+    -fx-text-fill: #2c3e50; /* dark text for labels on white form card */
+}
+
+/* Ensure labels inside the white form card are readable */
+.login-container .grid-pane .form-label {
+    -fx-text-fill: #2c3e50;
+}
+
+/* Improve prompt text visibility inside inputs */
+.text-field .prompt-text, .password-field .prompt-text {
+    -fx-fill: #6c757d;
+}
+
+.login-container .form-field {
+    -fx-pref-width: 320px;
+    -fx-background-color: #fff;
+    -fx-border-color: #ced4da;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+}
+
+.primary-button {
+    -fx-background-color: #4a90e2;
+    -fx-text-fill: white;
+    -fx-padding: 10px 20px;
+    -fx-background-radius: 8px;
+    -fx-font-weight: 600;
+}
+
+.primary-button:hover {
+    -fx-background-color: #3a7bc8;
+    -fx-opacity: 0.95;
+}
+
+/* Titles for auth screens */
+.login-container .app-title {
+    -fx-font-size: 34px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #ffffff;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 16, 0.4, 0, 2);
+}
+.login-container .welcome-subtitle {
+    -fx-font-size: 15px;
+    -fx-text-fill: rgba(255,255,255,0.85);
+}
+
+/* Register screen uses same container */
+.login-container .button {
+    -fx-background-radius: 6px;
+}
+
+.link-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #4a90e2;
+    -fx-underline: true;
 }
 
 /* Form Styles */

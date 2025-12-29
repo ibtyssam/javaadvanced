@@ -16,6 +16,8 @@ public class Recipe extends BaseModel {
     private List<Ingredient> ingredients;
     private List<String> instructions;
     private String category;
+    private Integer ownerUserId;
+    private String visibility; // PUBLIC or PRIVATE
 
     public Recipe() {
         this.ingredients = new ArrayList<>();
@@ -117,6 +119,22 @@ public class Recipe extends BaseModel {
         this.category = category;
     }
 
+    public Integer getOwnerUserId() {
+        return ownerUserId;
+    }
+
+    public void setOwnerUserId(Integer ownerUserId) {
+        this.ownerUserId = ownerUserId;
+    }
+
+    public String getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(String visibility) {
+        this.visibility = visibility;
+    }
+
     @Override
     public String toString() {
         return "Recipe{" +
@@ -128,6 +146,8 @@ public class Recipe extends BaseModel {
                 ", servings=" + servings +
                 ", difficulty='" + difficulty + '\'' +
                 ", category='" + category + '\'' +
+                ", ownerUserId=" + ownerUserId +
+                ", visibility='" + visibility + '\'' +
                 '}';
     }
 }

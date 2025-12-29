@@ -5,6 +5,7 @@ import java.util.List;
 import com.myapp.models.Recipe;
 import com.myapp.services.RecipeService;
 import com.myapp.services.RecipeServiceImpl;
+import com.myapp.services.SessionManager;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -201,7 +202,11 @@ public class RecipeListController {
                 System.out.println("After category filter: " + filtered.size() + " recipes");
             }
 
-            recipeList.setAll(filtered);
+                // Deduplicate by recipe id
+                filtered = filtered.stream()
+                    .distinct()
+                    .collect(java.util.stream.Collectors.toList());
+                recipeList.setAll(filtered);
             recipeTable.setItems(recipeList);
             System.out.println("Final result: " + filtered.size() + " recipes displayed");
             System.out.println("=== FILTER RECIPES END ===");
@@ -230,6 +235,9 @@ public class RecipeListController {
         TextField servingsField = new TextField();
         TextField difficultyField = new TextField();
         TextArea descriptionArea = new TextArea();
+        ComboBox<String> visibilityBox = new ComboBox<>();
+        visibilityBox.setItems(FXCollections.observableArrayList("PUBLIC", "PRIVATE"));
+        visibilityBox.getSelectionModel().select("PRIVATE");
 
         if (recipe != null) {
             titleField.setText(recipe.getTitle());
@@ -240,6 +248,9 @@ public class RecipeListController {
             difficultyField.setText(recipe.getDifficulty());
             descriptionArea.setText(recipe.getDescription());
         }
+        if (recipe != null && recipe.getVisibility() != null) {
+            visibilityBox.getSelectionModel().select(recipe.getVisibility());
+        }
 
         grid.addRow(0, new Label("Title*:"), titleField);
         grid.addRow(1, new Label("Category*:"), categoryField);
@@ -248,6 +259,7 @@ public class RecipeListController {
         grid.addRow(4, new Label("Servings*:"), servingsField);
         grid.addRow(5, new Label("Difficulty*:"), difficultyField);
         grid.addRow(6, new Label("Description*:"), descriptionArea);
+        grid.addRow(7, new Label("Visibility:"), visibilityBox);
 
         dialog.getDialogPane().setContent(grid);
 
@@ -272,6 +284,10 @@ public class RecipeListController {
                     toSave.setServings(servings);
                     toSave.setDifficulty(difficultyField.getText().trim());
                     toSave.setDescription(descriptionArea.getText().trim());
+                    toSave.setVisibility(visibilityBox.getSelectionModel().getSelectedItem());
+                    if (SessionManager.isLoggedIn() && SessionManager.getCurrentUser() != null) {
+                        toSave.setOwnerUserId(SessionManager.getCurrentUser().getId());
+                    }
 
                     recipeService.saveRecipe(toSave);
                     return toSave;
@@ -288,36 +304,28 @@ public class RecipeListController {
     private void viewSelectedRecipe() {
         Recipe selected = recipeTable.getSelectionModel().getSelectedItem();
         if (selected != null) {
-            StringBuilder details = new StringBuilder();
-            details.append("Title: ").append(selected.getTitle()).append("\n");
-            details.append("Category: ").append(selected.getCategory()).append("\n");
-            details.append("Difficulty: ").append(selected.getDifficulty()).append("\n");
-            details.append("Servings: ").append(selected.getServings()).append("\n");
-            details.append("Prep time: ").append(selected.getPreparationTime()).append(" min\n");
-            details.append("Cook time: ").append(selected.getCookingTime()).append(" min\n\n");
+            try {
+                java.net.URL fxmlUrl = getClass().getResource("/views/recipe-detail.fxml");
+                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(fxmlUrl);
+                javafx.scene.Parent root = loader.load();
+                com.myapp.controllers.RecipeDetailController controller = loader.getController();
+                controller.setRecipe(selected);
 
-            details.append("Description:\n");
-            details.append(selected.getDescription() != null ? selected.getDescription() : "").append("\n\n");
-
-            details.append("Ingredients:\n");
-            if (selected.getIngredients() != null && !selected.getIngredients().isEmpty()) {
-                for (int i = 0; i < selected.getIngredients().size(); i++) {
-                    details.append(" - ").append(selected.getIngredients().get(i)).append("\n");
+                javafx.stage.Stage stage = (javafx.stage.Stage) root.getScene() != null ? (javafx.stage.Stage) root.getScene().getWindow() : (javafx.stage.Stage) recipeTable.getScene().getWindow();
+                if (stage == null) {
+                    stage = (javafx.stage.Stage) recipeTable.getScene().getWindow();
                 }
-            } else {
-                details.append(" (none)\n");
-            }
-
-            details.append("\nInstructions:\n");
-            if (selected.getInstructions() != null && !selected.getInstructions().isEmpty()) {
-                for (int i = 0; i < selected.getInstructions().size(); i++) {
-                    details.append(" ").append(i + 1).append(". ").append(selected.getInstructions().get(i)).append("\n");
+                javafx.scene.Scene scene = new javafx.scene.Scene(root, 800, 600);
+                java.net.URL cssUrl = getClass().getResource("/styles/styles.css");
+                if (cssUrl != null) {
+                    scene.getStylesheets().add(cssUrl.toExternalForm());
                 }
-            } else {
-                details.append(" (none)\n");
+                stage.setScene(scene);
+                stage.setTitle("Recipe Details - " + selected.getTitle());
+                stage.show();
+            } catch (Exception e) {
+                showAlert("Error", "Failed to open recipe details: " + e.getMessage());
             }
-
-            showAlert("View Recipe", details.toString());
         }
     }
 

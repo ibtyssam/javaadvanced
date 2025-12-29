@@ -16,7 +16,11 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public List<Recipe> getAllRecipes() {
-        return recipeRepository.findAll();
+        Integer userId = null;
+        if (SessionManager.isLoggedIn() && SessionManager.getCurrentUser() != null) {
+            userId = SessionManager.getCurrentUser().getId();
+        }
+        return recipeRepository.findAllVisibleForUser(userId);
     }
 
     @Override
@@ -98,6 +102,7 @@ public class RecipeServiceImpl implements RecipeService {
                     
                     return matches;
                 })
+                .distinct()
                 .collect(Collectors.toList());
     }
 

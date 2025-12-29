@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.myapp.controllers.RecipeDetailController" spacing="10" styleClass="recipe-detail-container">
+    <HBox styleClass="header">
+        <Label fx:id="titleLabel" styleClass="title-label"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="backButton" text="Back" onAction="#handleBack"/>
+    </HBox>
+
+    <GridPane hgap="10" vgap="8">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="120"/>
+            <ColumnConstraints hgrow="ALWAYS"/>
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints vgrow="NEVER"/>
+        </rowConstraints>
+
+        <Label text="Category:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <Label fx:id="categoryLabel" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+        <Label text="Difficulty:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <Label fx:id="difficultyLabel" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+        <Label text="Servings:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <Label fx:id="servingsLabel" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+        <Label text="Prep (min):" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <Label fx:id="prepTimeLabel" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+        <Label text="Cook (min):" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+        <Label fx:id="cookTimeLabel" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+    </GridPane>
+
+    <Label text="Description" styleClass="section-title"/>
+    <TextArea fx:id="descriptionArea" editable="false" prefRowCount="4"/>
+
+    <Label text="Ingredients" styleClass="section-title"/>
+    <TextArea fx:id="ingredientsArea" editable="false" prefRowCount="6"/>
+
+    <Label text="Instructions" styleClass="section-title"/>
+    <TextArea fx:id="instructionsArea" editable="false" prefRowCount="8"/>
+
+    <HBox spacing="10" styleClass="button-bar">
+        <Button fx:id="editButton" text="Edit" onAction="#handleEdit"/>
+        <Button fx:id="deleteButton" text="Delete" onAction="#handleDelete" styleClass="delete-button"/>
+        <Region HBox.hgrow="ALWAYS"/>
+    </HBox>
+
+    <stylesheets>
+        @../styles/styles.css
+    </stylesheets>
+</VBox>

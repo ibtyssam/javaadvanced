@@ -15,9 +15,9 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         try {
             // Load the FXML file
-            URL fxmlUrl = getClass().getResource("/views/home.fxml");
+            URL fxmlUrl = getClass().getResource("/views/login.fxml");
             if (fxmlUrl == null) {
-                throw new RuntimeException("Cannot find FXML file: /views/home.fxml");
+                throw new RuntimeException("Cannot find FXML file: /views/login.fxml");
             }
             
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
@@ -31,7 +31,7 @@ public class Main extends Application {
             }
             
             // Configure the stage
-            primaryStage.setTitle("Recipe Management System");
+            primaryStage.setTitle("Recipe Management System - Login");
             primaryStage.setScene(scene);
             primaryStage.setMinWidth(800);
             primaryStage.setMinHeight(600);

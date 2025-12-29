@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<StackPane xmlns="http://javafx.com/javafx/17.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.myapp.controllers.LoginController" alignment="CENTER" styleClass="auth-root">
+    <children>
+        <VBox spacing="20" alignment="CENTER" styleClass="login-container">
+            <children>
+                <VBox alignment="CENTER" spacing="6">
+                    <Text styleClass="app-title" text="Recipe Manager" />
+                    <Text styleClass="welcome-subtitle" text="Please sign in" />
+                </VBox>
+
+                <GridPane hgap="12" vgap="12" styleClass="grid-pane">
+                    <padding><Insets topRightBottomLeft="10"/></padding>
+                    <children>
+                        <Label text="Email:" styleClass="form-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                        <TextField fx:id="emailField" promptText="you@example.com" styleClass="form-field" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                        <Label text="Password:" styleClass="form-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                        <PasswordField fx:id="passwordField" promptText="••••••••" styleClass="form-field" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                    </children>
+                </GridPane>
+
+                <HBox spacing="12">
+                    <Button text="Login" onAction="#handleLogin" styleClass="primary-button" />
+                    <Button text="Register" onAction="#handleGoToRegister" />
+                </HBox>
+            </children>
+        </VBox>
+    </children>
+
+    <stylesheets>
+        @../styles/styles.css
+    </stylesheets>
+</StackPane>

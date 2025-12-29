@@ -17,4 +17,5 @@ module com.myapp.recipemanagement {
     exports com.myapp.models;
     exports com.myapp.repositories;
     exports com.myapp.services;
+    exports com.myapp.dao;
 }
