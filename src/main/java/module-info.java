@@ -6,6 +6,7 @@ module com.myapp.recipemanagement {
     requires java.desktop;
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.ikonli.core;
+    requires jbcrypt;
     
     opens com.myapp to javafx.graphics, javafx.fxml;
     opens com.myapp.controllers to javafx.fxml;
