@@ -79,4 +79,17 @@ public class UserDaoImpl implements UserDao {
         }
         return null;
     }
+
+    @Override
+    public void updatePasswordHash(int userId, String hashedPassword) {
+        String sql = "UPDATE users SET password = ? WHERE id = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, hashedPassword);
+            ps.setInt(2, userId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to update user password hash", e);
+        }
+    }
 }

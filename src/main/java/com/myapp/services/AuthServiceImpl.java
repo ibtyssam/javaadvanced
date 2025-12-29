@@ -30,6 +30,12 @@ public class AuthServiceImpl implements AuthService {
             } else {
                 // Legacy accounts saved as plain text
                 ok = stored.equals(raw);
+                if (ok) {
+                    // Auto-migrate: re-hash and persist
+                    String newHash = BCrypt.hashpw(raw, BCrypt.gensalt(12));
+                    userDao.updatePasswordHash(existing.getId(), newHash);
+                    existing.setPassword(newHash);
+                }
             }
         } catch (IllegalArgumentException iae) {
             // e.g., invalid salt version -> treat as mismatch

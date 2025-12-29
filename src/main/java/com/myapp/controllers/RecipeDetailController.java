@@ -1,8 +1,11 @@
 package com.myapp.controllers;
 
+import java.net.URL;
+
 import com.myapp.models.Recipe;
 import com.myapp.services.RecipeService;
 import com.myapp.services.RecipeServiceImpl;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -12,8 +15,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
-
-import java.net.URL;
 
 public class RecipeDetailController {
     @FXML private Label titleLabel;

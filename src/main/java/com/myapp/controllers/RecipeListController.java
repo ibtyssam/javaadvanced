@@ -311,10 +311,7 @@ public class RecipeListController {
                 com.myapp.controllers.RecipeDetailController controller = loader.getController();
                 controller.setRecipe(selected);
 
-                javafx.stage.Stage stage = (javafx.stage.Stage) root.getScene() != null ? (javafx.stage.Stage) root.getScene().getWindow() : (javafx.stage.Stage) recipeTable.getScene().getWindow();
-                if (stage == null) {
-                    stage = (javafx.stage.Stage) recipeTable.getScene().getWindow();
-                }
+                javafx.stage.Stage stage = (javafx.stage.Stage) recipeTable.getScene().getWindow();
                 javafx.scene.Scene scene = new javafx.scene.Scene(root, 800, 600);
                 java.net.URL cssUrl = getClass().getResource("/styles/styles.css");
                 if (cssUrl != null) {
