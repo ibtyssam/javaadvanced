@@ -13,12 +13,28 @@ public class AuthServiceImpl implements AuthService {
         if (email == null || email.isBlank() || password == null || password.isBlank()) {
             return null;
         }
-        // Fetch user by email and verify hashed password
+        // Fetch user by email and verify password (BCrypt or legacy plain text)
         User existing = userDao.findByEmail(email.trim());
-        if (existing == null || existing.getPassword() == null) {
+        if (existing == null) {
             return null;
         }
-        boolean ok = BCrypt.checkpw(password.trim(), existing.getPassword());
+        String stored = existing.getPassword();
+        if (stored == null || stored.isBlank()) {
+            return null;
+        }
+        String raw = password.trim();
+        boolean ok;
+        try {
+            if (isBCryptHash(stored)) {
+                ok = BCrypt.checkpw(raw, stored);
+            } else {
+                // Legacy accounts saved as plain text
+                ok = stored.equals(raw);
+            }
+        } catch (IllegalArgumentException iae) {
+            // e.g., invalid salt version -> treat as mismatch
+            ok = false;
+        }
         return ok ? existing : null;
     }
 
@@ -33,4 +49,18 @@ public class AuthServiceImpl implements AuthService {
         // Rely on DB unique constraint; DAO will throw IllegalArgumentException for duplicates
         return userDao.create(user);
     }
+}
+
+// Package-private helper to detect BCrypt format
+class BCryptUtil {
+    static boolean isBCryptHash(String s) {
+        if (s == null) return false;
+        // Typical BCrypt prefixes and length ~60
+        return (s.startsWith("$2a$") || s.startsWith("$2b$") || s.startsWith("$2y$")) && s.length() >= 56;
+    }
+}
+
+// Allow calling without qualifier inside AuthServiceImpl
+private static boolean isBCryptHash(String s) {
+    return BCryptUtil.isBCryptHash(s);
 }
