@@ -16,7 +16,7 @@ module com.myapp.recipemanagement {
     exports com.myapp;
     exports com.myapp.controllers;
     exports com.myapp.models;
-    exports com.myapp.repositories;
+    // repositories removed in favor of DAO layer
     exports com.myapp.services;
     exports com.myapp.dao;
 }

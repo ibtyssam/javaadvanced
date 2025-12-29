@@ -4,14 +4,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.myapp.dao.RecipeDao;
+import com.myapp.dao.RecipeDaoImpl;
 import com.myapp.models.Recipe;
-import com.myapp.repositories.RecipeRepository;
 
 public class RecipeServiceImpl implements RecipeService {
-    private final RecipeRepository recipeRepository;
+    private final RecipeDao recipeDao;
 
     public RecipeServiceImpl() {
-        this.recipeRepository = new RecipeRepository();
+        this.recipeDao = new RecipeDaoImpl();
     }
 
     @Override
@@ -20,7 +21,7 @@ public class RecipeServiceImpl implements RecipeService {
         if (SessionManager.isLoggedIn() && SessionManager.getCurrentUser() != null) {
             userId = SessionManager.getCurrentUser().getId();
         }
-        return recipeRepository.findAllVisibleForUser(userId);
+        return recipeDao.findAllVisibleForUser(userId);
     }
 
     @Override
@@ -28,7 +29,7 @@ public class RecipeServiceImpl implements RecipeService {
         if (id == null) {
             return Optional.empty();
         }
-        return recipeRepository.findById(id);
+        return recipeDao.findById(id);
     }
 
     @Override
@@ -36,7 +37,7 @@ public class RecipeServiceImpl implements RecipeService {
         if (recipe == null) {
             throw new IllegalArgumentException("Recipe cannot be null");
         }
-        return recipeRepository.save(recipe);
+        return recipeDao.save(recipe);
     }
 
     @Override
@@ -44,7 +45,7 @@ public class RecipeServiceImpl implements RecipeService {
         if (id == null) {
             throw new IllegalArgumentException("Recipe ID cannot be null");
         }
-        recipeRepository.delete(id);
+        recipeDao.delete(id);
     }
 
     @Override
@@ -56,7 +57,7 @@ public class RecipeServiceImpl implements RecipeService {
         String lowerCaseQuery = query.toLowerCase().trim();
         int qlen = lowerCaseQuery.length();
         boolean shortQuery = qlen <= 2; // for very short queries, be strict
-        return recipeRepository.findAll().stream()
+        return recipeDao.findAll().stream()
                 .filter(recipe -> {
                     if (recipe == null) return false;
                     
@@ -113,7 +114,7 @@ public class RecipeServiceImpl implements RecipeService {
         }
 
         String lowerCaseCategory = category.toLowerCase();
-        return recipeRepository.findAll().stream()
+        return recipeDao.findAll().stream()
                 .filter(recipe -> 
                     recipe != null && 
                     recipe.getCategory() != null &&
