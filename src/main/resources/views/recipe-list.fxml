@@ -38,8 +38,6 @@
     <!-- Action Buttons -->
     <HBox spacing="10" styleClass="button-bar">
         <Button fx:id="viewButton" text="View Details" onAction="#handleViewRecipe" disable="true"/>
-        <Button fx:id="editButton" text="Edit" onAction="#handleEditRecipe" disable="true"/>
-        <Button fx:id="deleteButton" text="Delete" onAction="#handleDeleteRecipe" disable="true" styleClass="delete-button"/>
         <Region HBox.hgrow="ALWAYS"/>
         <Button fx:id="closeButton" text="Close" onAction="#handleClose"/>
     </HBox>

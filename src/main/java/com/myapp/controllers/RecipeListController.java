@@ -38,8 +38,6 @@ public class RecipeListController {
     @FXML private ComboBox<String> categoryFilter;
     @FXML private Button addButton;
     @FXML private Button viewButton;
-    @FXML private Button editButton;
-    @FXML private Button deleteButton;
     @FXML private Button closeButton;
 
     private final ObservableList<Recipe> recipeList = FXCollections.observableArrayList();
@@ -64,9 +62,19 @@ public class RecipeListController {
             (obs, oldSelection, newSelection) -> {
                 boolean itemSelected = newSelection != null;
                 viewButton.setDisable(!itemSelected);
-                editButton.setDisable(!itemSelected);
-                deleteButton.setDisable(!itemSelected);
             });
+
+        // Open details on double click
+        recipeTable.setRowFactory(table -> {
+            javafx.scene.control.TableRow<Recipe> row = new javafx.scene.control.TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (!row.isEmpty() && event.getClickCount() == 2) {
+                    Recipe selected = row.getItem();
+                    openRecipeDetails(selected);
+                }
+            });
+            return row;
+        });
     }
 
     @FXML
@@ -79,15 +87,7 @@ public class RecipeListController {
         viewSelectedRecipe();
     }
     
-    @FXML
-    private void handleEditRecipe() {
-        editSelectedRecipe();
-    }
-    
-    @FXML
-    private void handleDeleteRecipe() {
-        deleteSelectedRecipe();
-    }
+    // Edit/Delete removed from list page; actions are available on detail page
     
     @FXML
     private void handleSearch(ActionEvent event) {
@@ -304,55 +304,33 @@ public class RecipeListController {
     private void viewSelectedRecipe() {
         Recipe selected = recipeTable.getSelectionModel().getSelectedItem();
         if (selected != null) {
-            try {
-                java.net.URL fxmlUrl = getClass().getResource("/views/recipe-detail.fxml");
-                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(fxmlUrl);
-                javafx.scene.Parent root = loader.load();
-                com.myapp.controllers.RecipeDetailController controller = loader.getController();
-                controller.setRecipe(selected);
+            openRecipeDetails(selected);
+        }
+    }
 
-                javafx.stage.Stage stage = (javafx.stage.Stage) recipeTable.getScene().getWindow();
-                javafx.scene.Scene scene = new javafx.scene.Scene(root, 800, 600);
-                java.net.URL cssUrl = getClass().getResource("/styles/styles.css");
-                if (cssUrl != null) {
-                    scene.getStylesheets().add(cssUrl.toExternalForm());
-                }
-                stage.setScene(scene);
-                stage.setTitle("Recipe Details - " + selected.getTitle());
-                stage.show();
-            } catch (Exception e) {
-                showAlert("Error", "Failed to open recipe details: " + e.getMessage());
+    private void openRecipeDetails(Recipe selected) {
+        try {
+            java.net.URL fxmlUrl = getClass().getResource("/views/recipe-detail.fxml");
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(fxmlUrl);
+            javafx.scene.Parent root = loader.load();
+            com.myapp.controllers.RecipeDetailController controller = loader.getController();
+            controller.setRecipe(selected);
+
+            javafx.stage.Stage stage = (javafx.stage.Stage) recipeTable.getScene().getWindow();
+            javafx.scene.Scene scene = new javafx.scene.Scene(root, 800, 600);
+            java.net.URL cssUrl = getClass().getResource("/styles/styles.css");
+            if (cssUrl != null) {
+                scene.getStylesheets().add(cssUrl.toExternalForm());
             }
+            stage.setScene(scene);
+            stage.setTitle("Recipe Details - " + selected.getTitle());
+            stage.show();
+        } catch (Exception e) {
+            showAlert("Error", "Failed to open recipe details: " + e.getMessage());
         }
     }
 
-    private void editSelectedRecipe() {
-        Recipe selected = recipeTable.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            showRecipeForm(selected);
-        }
-    }
-
-    private void deleteSelectedRecipe() {
-        Recipe selected = recipeTable.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-            confirm.setTitle("Delete Recipe");
-            confirm.setHeaderText(null);
-            confirm.setContentText("Are you sure you want to delete '" + selected.getTitle() + "'?");
-
-            confirm.showAndWait().ifPresent(buttonType -> {
-                if (buttonType == ButtonType.OK) {
-                    try {
-                        recipeService.deleteRecipe(selected.getId());
-                        recipeList.remove(selected);
-                    } catch (Exception e) {
-                        showAlert("Error", "Failed to delete recipe: " + e.getMessage());
-                    }
-                }
-            });
-        }
-    }
+    // Deletion is now handled on the detail page
 
     private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
