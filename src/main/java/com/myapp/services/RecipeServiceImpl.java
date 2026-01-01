@@ -1,6 +1,8 @@
 package com.myapp.services;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -21,7 +23,7 @@ public class RecipeServiceImpl implements RecipeService {
         if (SessionManager.isLoggedIn() && SessionManager.getCurrentUser() != null) {
             userId = SessionManager.getCurrentUser().getId();
         }
-        return recipeDao.findAllVisibleForUser(userId);
+        return dedupeById(recipeDao.findAllVisibleForUser(userId));
     }
 
     @Override
@@ -57,7 +59,9 @@ public class RecipeServiceImpl implements RecipeService {
         String lowerCaseQuery = query.toLowerCase().trim();
         int qlen = lowerCaseQuery.length();
         boolean shortQuery = qlen <= 2; // for very short queries, be strict
-        return recipeDao.findAll().stream()
+        // Search only in the set of visible recipes for current user
+        return dedupeById(
+            getAllRecipes().stream()
                 .filter(recipe -> {
                     if (recipe == null) return false;
                     
@@ -103,8 +107,8 @@ public class RecipeServiceImpl implements RecipeService {
                     
                     return matches;
                 })
-                .distinct()
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+        );
     }
 
     @Override
@@ -114,12 +118,34 @@ public class RecipeServiceImpl implements RecipeService {
         }
 
         String lowerCaseCategory = category.toLowerCase();
-        return recipeDao.findAll().stream()
+        // Filter only visible recipes for current user
+        return dedupeById(
+            getAllRecipes().stream()
                 .filter(recipe -> 
                     recipe != null && 
                     recipe.getCategory() != null &&
                     recipe.getCategory().toLowerCase().equals(lowerCaseCategory)
-                )
-                .collect(Collectors.toList());
+            )
+            .collect(Collectors.toList())
+        );
     }
+
+        private List<Recipe> dedupeById(List<Recipe> recipes) {
+        if (recipes == null || recipes.isEmpty()) return recipes;
+        Map<Integer, Recipe> byId = recipes.stream()
+            .filter(r -> r != null && r.getId() != null)
+            .collect(Collectors.toMap(
+                Recipe::getId,
+                r -> r,
+                (a, b) -> a,
+                LinkedHashMap::new
+            ));
+        // Keep any without IDs as-is after the ID-based items
+        List<Recipe> withoutId = recipes.stream()
+            .filter(r -> r != null && r.getId() == null)
+            .collect(Collectors.toList());
+        List<Recipe> result = new java.util.ArrayList<>(byId.values());
+        result.addAll(withoutId);
+        return result;
+        }
 }

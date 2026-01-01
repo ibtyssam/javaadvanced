@@ -2,6 +2,7 @@ package com.myapp.controllers;
 
 import java.net.URL;
 
+import com.myapp.models.Ingredient;
 import com.myapp.models.Recipe;
 import com.myapp.services.RecipeService;
 import com.myapp.services.RecipeServiceImpl;
@@ -66,6 +67,7 @@ public class RecipeDetailController {
         try {
             javafx.scene.control.Dialog<Recipe> dialog = new javafx.scene.control.Dialog<>();
             dialog.setTitle("Edit Recipe");
+            dialog.setResizable(true);
 
             javafx.scene.control.ButtonType saveButtonType = new javafx.scene.control.ButtonType("Save", javafx.scene.control.ButtonBar.ButtonData.OK_DONE);
             dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, javafx.scene.control.ButtonType.CANCEL);
@@ -81,6 +83,33 @@ public class RecipeDetailController {
             javafx.scene.control.TextField servingsField = new javafx.scene.control.TextField(String.valueOf(recipe.getServings()));
             javafx.scene.control.TextField difficultyField = new javafx.scene.control.TextField(nonNull(recipe.getDifficulty()));
             javafx.scene.control.TextArea descriptionEditArea = new javafx.scene.control.TextArea(nonNull(recipe.getDescription()));
+            javafx.scene.control.TextArea ingredientsEditArea = new javafx.scene.control.TextArea();
+            javafx.scene.control.TextArea instructionsEditArea = new javafx.scene.control.TextArea();
+            // Keep text areas compact and readable
+            descriptionEditArea.setWrapText(true);
+            ingredientsEditArea.setWrapText(true);
+            instructionsEditArea.setWrapText(true);
+            descriptionEditArea.setPrefRowCount(5);
+            ingredientsEditArea.setPrefRowCount(6);
+            instructionsEditArea.setPrefRowCount(8);
+            // Prefill ingredients as lines: name;qty;unit;notes
+            if (recipe.getIngredients() != null && !recipe.getIngredients().isEmpty()) {
+                String ingText = recipe.getIngredients().stream()
+                        .map(i -> {
+                            String q = i.getQuantity() > 0 ? String.valueOf(i.getQuantity()) : "";
+                            String u = i.getUnit() != null ? i.getUnit() : "";
+                            String n = i.getNotes() != null ? i.getNotes() : "";
+                            return String.join(";", java.util.stream.Stream.of(i.getName(), q, u, n)
+                                    .map(s -> s == null ? "" : s).toArray(String[]::new));
+                        })
+                        .collect(java.util.stream.Collectors.joining("\n"));
+                ingredientsEditArea.setText(ingText);
+            }
+            // Prefill instructions one per line
+            if (recipe.getInstructions() != null && !recipe.getInstructions().isEmpty()) {
+                String instrText = String.join("\n", recipe.getInstructions());
+                instructionsEditArea.setText(instrText);
+            }
             javafx.scene.control.ComboBox<String> visibilityBox = new javafx.scene.control.ComboBox<>();
             visibilityBox.setItems(javafx.collections.FXCollections.observableArrayList("PUBLIC", "PRIVATE"));
             visibilityBox.getSelectionModel().select(recipe.getVisibility() == null ? "PRIVATE" : recipe.getVisibility());
@@ -92,9 +121,16 @@ public class RecipeDetailController {
             grid.addRow(4, new javafx.scene.control.Label("Servings*:"), servingsField);
             grid.addRow(5, new javafx.scene.control.Label("Difficulty*:"), difficultyField);
             grid.addRow(6, new javafx.scene.control.Label("Description*:"), descriptionEditArea);
-            grid.addRow(7, new javafx.scene.control.Label("Visibility:"), visibilityBox);
+            grid.addRow(7, new javafx.scene.control.Label("Ingredients (name;qty;unit;notes):"), ingredientsEditArea);
+            grid.addRow(8, new javafx.scene.control.Label("Instructions (one per line):"), instructionsEditArea);
+            grid.addRow(9, new javafx.scene.control.Label("Visibility:"), visibilityBox);
 
-            dialog.getDialogPane().setContent(grid);
+            // Wrap content to prevent oversized dialogs and keep buttons visible
+            javafx.scene.control.ScrollPane scrollPane = new javafx.scene.control.ScrollPane(grid);
+            scrollPane.setFitToWidth(true);
+            scrollPane.setHbarPolicy(javafx.scene.control.ScrollPane.ScrollBarPolicy.NEVER);
+            dialog.getDialogPane().setContent(scrollPane);
+            dialog.getDialogPane().setPrefSize(700, 600);
 
             dialog.setResultConverter(dialogButton -> {
                 if (dialogButton == saveButtonType) {
@@ -111,6 +147,43 @@ public class RecipeDetailController {
                         recipe.setDifficulty(difficultyField.getText().trim());
                         recipe.setDescription(descriptionEditArea.getText().trim());
                         recipe.setVisibility(visibilityBox.getSelectionModel().getSelectedItem());
+                        // Parse ingredients
+                        java.util.List<Ingredient> parsedIngredients = new java.util.ArrayList<>();
+                        String ingText = ingredientsEditArea.getText();
+                        if (ingText != null && !ingText.trim().isEmpty()) {
+                            String[] lines = ingText.split("\r?\n");
+                            for (String line : lines) {
+                                if (line == null) continue;
+                                String trimmed = line.trim();
+                                if (trimmed.isEmpty()) continue;
+                                String[] parts = trimmed.split(";", -1);
+                                String name = parts.length > 0 ? parts[0].trim() : "";
+                                if (name.isEmpty()) continue;
+                                double qty = 0.0;
+                                if (parts.length > 1 && !parts[1].trim().isEmpty()) {
+                                    try { qty = Double.parseDouble(parts[1].trim()); } catch (Exception ignore) {}
+                                }
+                                String unit = parts.length > 2 ? parts[2].trim() : "";
+                                String notes = parts.length > 3 ? parts[3].trim() : "";
+                                Ingredient ing = new Ingredient();
+                                ing.setName(name);
+                                ing.setQuantity(qty);
+                                ing.setUnit(unit);
+                                ing.setNotes(notes);
+                                parsedIngredients.add(ing);
+                            }
+                        }
+                        recipe.setIngredients(parsedIngredients);
+                        // Parse instructions
+                        java.util.List<String> parsedInstructions = new java.util.ArrayList<>();
+                        String instrText = instructionsEditArea.getText();
+                        if (instrText != null && !instrText.trim().isEmpty()) {
+                            String[] lines = instrText.split("\r?\n");
+                            for (String l : lines) {
+                                if (l != null && !l.trim().isEmpty()) parsedInstructions.add(l.trim());
+                            }
+                        }
+                        recipe.setInstructions(parsedInstructions);
 
                         recipeService.saveRecipe(recipe);
                         return recipe;

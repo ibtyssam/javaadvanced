@@ -2,6 +2,7 @@ package com.myapp.controllers;
 
 import java.util.List;
 
+import com.myapp.models.Ingredient;
 import com.myapp.models.Recipe;
 import com.myapp.services.RecipeService;
 import com.myapp.services.RecipeServiceImpl;
@@ -202,10 +203,20 @@ public class RecipeListController {
                 System.out.println("After category filter: " + filtered.size() + " recipes");
             }
 
-                // Deduplicate by recipe id
-                filtered = filtered.stream()
-                    .distinct()
-                    .collect(java.util.stream.Collectors.toList());
+                    // Final safety dedupe by recipe id
+                    java.util.Map<Integer, Recipe> byId = filtered.stream()
+                        .filter(r -> r != null && r.getId() != null)
+                        .collect(java.util.stream.Collectors.toMap(
+                            Recipe::getId,
+                            r -> r,
+                            (a,b) -> a,
+                            java.util.LinkedHashMap::new
+                        ));
+                    java.util.List<Recipe> noId = filtered.stream()
+                        .filter(r -> r != null && r.getId() == null)
+                        .collect(java.util.stream.Collectors.toList());
+                    filtered = new java.util.ArrayList<>(byId.values());
+                    filtered.addAll(noId);
                 recipeList.setAll(filtered);
             recipeTable.setItems(recipeList);
             System.out.println("Final result: " + filtered.size() + " recipes displayed");
@@ -220,6 +231,7 @@ public class RecipeListController {
     private void showRecipeForm(Recipe recipe) {
         Dialog<Recipe> dialog = new Dialog<>();
         dialog.setTitle(recipe == null ? "Add Recipe" : "Edit Recipe");
+        dialog.setResizable(true);
 
         ButtonType saveButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
@@ -235,6 +247,15 @@ public class RecipeListController {
         TextField servingsField = new TextField();
         TextField difficultyField = new TextField();
         TextArea descriptionArea = new TextArea();
+        TextArea ingredientsArea = new TextArea();
+        TextArea instructionsArea = new TextArea();
+        // Keep text areas compact and readable
+        descriptionArea.setWrapText(true);
+        ingredientsArea.setWrapText(true);
+        instructionsArea.setWrapText(true);
+        descriptionArea.setPrefRowCount(5);
+        ingredientsArea.setPrefRowCount(6);
+        instructionsArea.setPrefRowCount(8);
         ComboBox<String> visibilityBox = new ComboBox<>();
         visibilityBox.setItems(FXCollections.observableArrayList("PUBLIC", "PRIVATE"));
         visibilityBox.getSelectionModel().select("PRIVATE");
@@ -247,6 +268,24 @@ public class RecipeListController {
             servingsField.setText(String.valueOf(recipe.getServings()));
             difficultyField.setText(recipe.getDifficulty());
             descriptionArea.setText(recipe.getDescription());
+            // Prefill ingredients as lines: name;quantity;unit;notes
+            if (recipe.getIngredients() != null && !recipe.getIngredients().isEmpty()) {
+                String ingText = recipe.getIngredients().stream()
+                        .map(i -> {
+                            String q = i.getQuantity() > 0 ? String.valueOf(i.getQuantity()) : "";
+                            String u = i.getUnit() != null ? i.getUnit() : "";
+                            String n = i.getNotes() != null ? i.getNotes() : "";
+                            return String.join(";", java.util.stream.Stream.of(i.getName(), q, u, n)
+                                    .map(s -> s == null ? "" : s).toArray(String[]::new));
+                        })
+                        .collect(java.util.stream.Collectors.joining("\n"));
+                ingredientsArea.setText(ingText);
+            }
+            // Prefill instructions one per line
+            if (recipe.getInstructions() != null && !recipe.getInstructions().isEmpty()) {
+                String instrText = String.join("\n", recipe.getInstructions());
+                instructionsArea.setText(instrText);
+            }
         }
         if (recipe != null && recipe.getVisibility() != null) {
             visibilityBox.getSelectionModel().select(recipe.getVisibility());
@@ -259,9 +298,16 @@ public class RecipeListController {
         grid.addRow(4, new Label("Servings*:"), servingsField);
         grid.addRow(5, new Label("Difficulty*:"), difficultyField);
         grid.addRow(6, new Label("Description*:"), descriptionArea);
-        grid.addRow(7, new Label("Visibility:"), visibilityBox);
+        grid.addRow(7, new Label("Ingredients (name;qty;unit;notes):"), ingredientsArea);
+        grid.addRow(8, new Label("Instructions (one per line):"), instructionsArea);
+        grid.addRow(9, new Label("Visibility:"), visibilityBox);
 
-        dialog.getDialogPane().setContent(grid);
+        // Wrap content to avoid oversized dialog and keep buttons visible
+        javafx.scene.control.ScrollPane scrollPane = new javafx.scene.control.ScrollPane(grid);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setHbarPolicy(javafx.scene.control.ScrollPane.ScrollBarPolicy.NEVER);
+        dialog.getDialogPane().setContent(scrollPane);
+        dialog.getDialogPane().setPrefSize(700, 600);
 
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == saveButtonType) {
@@ -284,6 +330,43 @@ public class RecipeListController {
                     toSave.setServings(servings);
                     toSave.setDifficulty(difficultyField.getText().trim());
                     toSave.setDescription(descriptionArea.getText().trim());
+                    // Parse ingredients
+                    java.util.List<Ingredient> parsedIngredients = new java.util.ArrayList<>();
+                    String ingText = ingredientsArea.getText();
+                    if (ingText != null && !ingText.trim().isEmpty()) {
+                        String[] lines = ingText.split("\r?\n");
+                        for (String line : lines) {
+                            if (line == null) continue;
+                            String trimmed = line.trim();
+                            if (trimmed.isEmpty()) continue;
+                            String[] parts = trimmed.split(";", -1);
+                            String name = parts.length > 0 ? parts[0].trim() : "";
+                            if (name.isEmpty()) continue;
+                            double qty = 0.0;
+                            if (parts.length > 1 && !parts[1].trim().isEmpty()) {
+                                try { qty = Double.parseDouble(parts[1].trim()); } catch (Exception ignore) {}
+                            }
+                            String unit = parts.length > 2 ? parts[2].trim() : "";
+                            String notes = parts.length > 3 ? parts[3].trim() : "";
+                            Ingredient ing = new Ingredient();
+                            ing.setName(name);
+                            ing.setQuantity(qty);
+                            ing.setUnit(unit);
+                            ing.setNotes(notes);
+                            parsedIngredients.add(ing);
+                        }
+                    }
+                    toSave.setIngredients(parsedIngredients);
+                    // Parse instructions
+                    java.util.List<String> parsedInstructions = new java.util.ArrayList<>();
+                    String instrText = instructionsArea.getText();
+                    if (instrText != null && !instrText.trim().isEmpty()) {
+                        String[] lines = instrText.split("\r?\n");
+                        for (String l : lines) {
+                            if (l != null && !l.trim().isEmpty()) parsedInstructions.add(l.trim());
+                        }
+                    }
+                    toSave.setInstructions(parsedInstructions);
                     toSave.setVisibility(visibilityBox.getSelectionModel().getSelectedItem());
                     if (SessionManager.isLoggedIn() && SessionManager.getCurrentUser() != null) {
                         toSave.setOwnerUserId(SessionManager.getCurrentUser().getId());
