@@ -6,13 +6,14 @@
 <?import javafx.scene.control.cell.*?>
 
 <VBox xmlns="http://javafx.com/javafx/17.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.myapp.controllers.RecipeListController"
-      styleClass="recipe-list-container" spacing="10">
+    fx:id="root" styleClass="recipe-list-container" spacing="10">
     
     <!-- Header -->
     <HBox styleClass="header">
         <Label text="Recipe Manager" styleClass="title-label"/>
         <Region HBox.hgrow="ALWAYS"/>
         <Button text="Add Recipe" onAction="#handleAddRecipe" styleClass="add-button"/>
+        <Button text="Logout" onAction="#handleLogout"/>
     </HBox>
     
     <!-- Search and Filter Bar -->

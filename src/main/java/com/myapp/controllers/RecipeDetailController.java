@@ -256,4 +256,25 @@ public class RecipeDetailController {
     private String nonNull(String s) {
         return s == null ? "" : s;
     }
+
+    @FXML
+    private void handleLogout() {
+        try {
+            com.myapp.services.SessionManager.logout();
+            Stage stage = (Stage) backButton.getScene().getWindow();
+            URL fxmlUrl = getClass().getResource("/views/login.fxml");
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            Parent root = loader.load();
+            Scene scene = new Scene(root, 800, 600);
+            URL cssUrl = getClass().getResource("/styles/styles.css");
+            if (cssUrl != null) {
+                scene.getStylesheets().add(cssUrl.toExternalForm());
+            }
+            stage.setScene(scene);
+            stage.setTitle("Recipe Management System - Login");
+            stage.show();
+        } catch (Exception e) {
+            showError("Failed to logout: " + e.getMessage());
+        }
+    }
 }

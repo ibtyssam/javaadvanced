@@ -40,6 +40,37 @@ public class RecipeListController {
     @FXML private Button addButton;
     @FXML private Button viewButton;
     @FXML private Button closeButton;
+    
+    @FXML
+    private void handleLogout() {
+        try {
+            com.myapp.services.SessionManager.logout();
+            javafx.stage.Stage stage = null;
+            if (closeButton != null && closeButton.getScene() != null) {
+                stage = (javafx.stage.Stage) closeButton.getScene().getWindow();
+            } else if (recipeTable != null && recipeTable.getScene() != null) {
+                stage = (javafx.stage.Stage) recipeTable.getScene().getWindow();
+            } else if (root != null && root.getScene() != null) {
+                stage = (javafx.stage.Stage) root.getScene().getWindow();
+            }
+            if (stage == null) {
+                throw new IllegalStateException("Cannot locate window for logout");
+            }
+            java.net.URL fxmlUrl = getClass().getResource("/views/login.fxml");
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(fxmlUrl);
+            javafx.scene.Parent loginRoot = loader.load();
+            javafx.scene.Scene scene = new javafx.scene.Scene(loginRoot, 800, 600);
+            java.net.URL cssUrl = getClass().getResource("/styles/styles.css");
+            if (cssUrl != null) {
+                scene.getStylesheets().add(cssUrl.toExternalForm());
+            }
+            stage.setScene(scene);
+            stage.setTitle("Recipe Management System - Login");
+            stage.show();
+        } catch (Exception e) {
+            showAlert("Error", "Failed to logout: " + e.getMessage());
+        }
+    }
 
     private final ObservableList<Recipe> recipeList = FXCollections.observableArrayList();
     private final RecipeService recipeService = new RecipeServiceImpl();
